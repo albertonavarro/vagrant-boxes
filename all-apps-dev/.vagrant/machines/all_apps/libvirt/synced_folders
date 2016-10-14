@@ -1,0 +1,1 @@
+{"rsync":{"/vagrant":{"type":"rsync","guestpath":"/vagrant","hostpath":"/root/vagrant-libvirt/all-apps-dev","disabled":false,"owner":"vagrant","group":"vagrant"}}}

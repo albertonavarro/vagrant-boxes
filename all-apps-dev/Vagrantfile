@@ -1,0 +1,41 @@
+
+Vagrant.configure("2") do |config|
+
+  # Example configuration of new VM..
+  # 
+  config.vm.define :all_apps do |all_apps|
+    all_apps.vm.box = "s3than/trusty64"
+    all_apps.vm.synced_folder './', '/vagrant', type: 'rsync'
+    #all_apps.vm.network :public_network, :bridge => 'br0', :dev => 'br0', #:use_dhcp_assigned_default_route => true, :model_type => 'virtio'
+    all_apps.vm.network :public_network,
+      :dev => "br0",
+      :mode => "bridge",
+      :type => "bridge",
+      :use_dhcp_assigned_default_route => true
+    all_apps.vm.hostname = "devS02E03"
+    all_apps.vm.provider :libvirt do |domain|
+      domain.memory = 2048
+      domain.cpus = 2
+    end
+
+  end
+
+  config.vm.provider :libvirt do |libvirt|
+    libvirt.driver = "kvm"
+    #libvirt.host = "192.168.1.69"
+    #libvirt.connect_via_ssh = true
+    #libvirt.username = "root"
+    libvirt.storage_pool_name = "default"
+    libvirt.storage :file, :size => '60G', :type => 'qcow2', :allow_existing => true
+    libvirt.storage :file, :size => '60G', :type => 'qcow2', :allow_existing => true
+  end
+ 
+  config.vm.provision "chef_client" do |chef|
+    chef.chef_server_url = "https://api.opscode.com/organizations/navid-reloaded"
+    chef.validation_client_name = "navid-reloaded-validator"
+    chef.validation_key_path = "/root/chef-repo/.chef/navid-reloaded-validator.pem"
+    chef.add_role "all-apps-dev"
+    chef.environment = "dev1"
+  end
+end
+ 
